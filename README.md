@@ -1,2 +1,2 @@
-# -lgebra-Linear-Num-rica-
+# -Algebra-Linear-Numerica-
 Aulas práticas e atividades feitas na disciplina com uso do Scilab.
