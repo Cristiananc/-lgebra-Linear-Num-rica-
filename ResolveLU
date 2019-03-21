@@ -1,0 +1,62 @@
+//Variáveis de saída:
+//x: solução do sistema Ax=b (assumimos que tal solução existe).
+//C: Seja A=LU a decomposição LU de A.
+//Então C(i,j)=L(i,j) para i>j e C(i,j)=U(i,j) para j>=i
+function [X] = Resolve_com_LU(A,b)
+    
+    C = [A,b(:,1)];
+    [n] = size(C,1);
+    p = eye(n,n); //Cria  a matriz identidade que será a matriz de permutação
+    
+    for j=1:(n-1)
+        //O pivô está posição (j,j)
+        for i = (j+1): n
+            //O elemento C(i,j) é o elemento na posição (i,j) de L na decomposição LU de A
+                [a,index] = max(abs(C(j:n,j))); //Encontra o pivô de maior módulo 
+                // a partir da linha j. 
+                // Atualiza o valor do index já que ele considera o índice apenas do vetor C(j:n, j) e não o índice que seria na matriz completa
+                index = index + j -1;
+                C([index,j], :) = C([j,index], :); //Troca as linhas de C
+                p([index,j], :) = p([j,index], :); //Troca as mesmas linhas de p
+
+                C(i,j)= C(i,j)/C(j,j);
+                //Linha i <-Linha i -C(i,j)*Linha j
+                //Somente os elementos acima da diagonal são computados (aqueles que
+                 //compõema matrix U)
+                C(i,j+1: n+ 1) = C(i,j+1: n+1) - C(i,j)*C(j,j +1: n+1);
+            end
+        end
+    x = zeros(n,1);
+    //Calcula x, sendo Ux = C(1:n, n+ 1)
+    x(n) = C(n, n+1)/C(n,n);
+    for i = n-1:-1:1
+        x(i) = (C(i,n+1) - C(i,i:n)*x(i:n))/C(i,i);
+    end
+    C = C(1:n, 1:n);
+    
+    //Encontra as matrizes L e U
+    L = tril(C, -1) + eye(n,n); 
+    U = triu(C);
+    
+    // C já é a matriz com a permutação das linhas e permutamos a matriz b também
+    b = p*b;
+    bc = size(b, 2);
+    
+    // Precisamos resolver agora LUx = Pb
+    y = zeros(n, bc);
+    //Calcula Ly = b 
+    y(1, 1:bc) = b(1, 1: bc); 
+    for k = 1: bc //Repete o processo pra cada coluna de b
+        for m = 2: n
+            y(m, k) = b(m,k) - L(m,1: m -1)*y(1:m -1, k); 
+        end
+    end
+    // Ux = y
+    X = zeros(n, bc);
+    for l = 1: bc
+        X(n, l) = y(n, l)/U(n,n);
+        for o = n-1:-1:1 //Calcula os valores de X indo debaixo pra cima
+            X(o, l) = (y(o, l) - U(o, o+1 :n)*X(o +1:n,l))/U(o,o);
+        end
+    end
+endfunction
