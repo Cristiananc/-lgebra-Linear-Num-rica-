@@ -1,2 +1,2 @@
-# -Algebra-Linear-Numerica-
-Aulas práticas e atividades feitas na disciplina com uso do Scilab.
+# -Análise-Numerica-
+Aulas práticas e atividades feitas nas disciplinas de Introdução à Análise Numérica e Algébra Linear Numérica.
